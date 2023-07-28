@@ -1,4 +1,4 @@
-import React, { Suspense } from "react";
+import React, { useEffect, useState, Suspense } from "react";
 import "./App.css";
 import { Helmet } from "react-helmet";
 import HeroSection from "./components/HeroSection";
@@ -8,9 +8,26 @@ import SocialShareMobile from "./components/SocialShareMobile";
 const About = React.lazy(() => import("./components/About"));
 const Projects = React.lazy(() => import("./components/Projects"));
 const Skills = React.lazy(() => import("./components/Skills"));
+const Studies = React.lazy(() => import("./components/Studies"));
 const Footer = React.lazy(() => import("./components/Footer"));
 
 const App = () => {
+
+  const [hideNav, setHideNav] = useState(false);
+
+  useEffect(() => {
+    const resize = () => {
+      setHideNav(window.innerWidth <= 760);
+    };
+
+    window.addEventListener("resize", resize);
+    resize();
+
+    return () => {
+      window.removeEventListener("resize", resize);
+    };
+  }, []);
+
   const personStructuredData = {
     "@context": "https://schema.org/",
     "@type": "Person",
@@ -27,19 +44,19 @@ const App = () => {
   return (
     <>
       <Helmet>
-
         <script type="application/ld+json">
           {JSON.stringify(personStructuredData)}
         </script>
       </Helmet>
 
       <Suspense fallback={<Loader />}>
-        {window.innerWidth > 769 ? <SocialShareWeb /> : <SocialShareMobile />}
+        {hideNav ? <SocialShareMobile /> : <SocialShareWeb />}
         <HeroSection />
         <About />
         <Projects />
 
         <Skills />
+        <Studies />
         <Footer />
       </Suspense>
     </>
